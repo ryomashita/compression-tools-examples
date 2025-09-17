@@ -1,0 +1,10 @@
+BasedOnStyle: Google
+
+Language: Cpp
+# IndentWidth: 2
+# TabWidth: 2
+# UseTab: ForIndentation
+InsertNewlineAtEOF: true # Insert a newline at end of file if missing.
+
+LineEnding: LE_DeriveLF # Use \n unless the input has more lines ending in \r\n.
+# DeriveLineEnding and UseCRLF are deprecated.

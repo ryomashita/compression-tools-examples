@@ -1,0 +1,104 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // "Refer: https://github.com/microsoft/vscode-cmake-tools/blob/HEAD/docs/tasks.md"
+        {
+            "type": "cmake",
+            "label": "CMake: build",
+            "command": "build",
+            // "dependsOn": ["CMake: Configure"], // 時間がかかるため省略
+            "targets": [
+                "all"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Default build task."
+        },
+        {
+            "type": "cmake",
+            "label": "Cmake: test",
+            "command": "test",
+            "dependsOn": [
+                "CMake: build"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "detail": "Default test task."
+        },
+        {
+            "type": "shell",
+            "label": "shell ctest",
+            "command": [
+                "cd ${workspaceFolder}/build && ctest"
+            ],
+            "dependsOn": [
+                "CMake: build"
+            ],
+            "detail": "run ctest in shell.",
+            "problemMatcher": [],
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: install",
+            "command": "install",
+            "options": {
+                "installPrefix": "${workspaceFolder}/install",
+            },
+            "detail": "CMake template install task"
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: clean",
+            "command": "clean",
+            "detail": "CMake template clean task"
+        },
+        {
+            "type": "shell",
+            "label": "Open Install Directory",
+            "command": [
+                "explorer.exe '${workspaceFolder}\\install'"
+            ],
+            "detail": "open ${workspaceFolder}/install in explorer.exe.",
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "C/C++ Check Format for Workspace",
+            // --dry-run オプションを追加すれば、lintも可能
+            "windows": {
+                "command": "clang-format -style=file --dry-run --Werror $(Get-ChildItem -Path $PWD/src,$PWD/test,$PWD/include -Recurse | Where Name -Match '.(?:cpp|hpp|h|cc|cxx)$' | Select-Object -ExpandProperty FullName)"
+            },
+            "linux": {
+                "command": "find src test include -regex '.*\\.\\(cpp\\|hpp\\|h\\|cc\\|cxx\\)' -exec clang-format -style=file --dry-run --Werror -i {} +"
+            },
+            "detail": "run clang-format --dry-run for workspaceFolder",
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Clang-tidy file",
+            "command": [
+                "clang-tidy ${file} -p ${workspaceFolder}/build/compile_commands.json"
+            ],
+            "detail": "run clang-tidy for file",
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Generate GraphViz file",
+            "command": [
+                "cmake -S . -B build --graphviz=build/dot/graph.dot && dot -Kdot build/dot/graph.dot -Tpdf -o build/dot/graph.pdf"
+            ],
+            "dependsOn": [],
+            "detail": "generate image file showing the dependencies between targets.",
+            // ref: https://cmake.org/cmake/help/latest/module/CMakeGraphVizOptions.html
+            "problemMatcher": []
+        }
+    ],
+}
