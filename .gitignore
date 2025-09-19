@@ -2,6 +2,9 @@
 build/**
 install/**
 .cache/**
+vcpkg_installed/**
+.env
+CMakeUserPresets.json
 
 # Prerequisites
 *.d

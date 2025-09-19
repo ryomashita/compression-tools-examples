@@ -5,6 +5,7 @@ Example codes for popular compression tools and libraries. (zstd, gzip, etc.)
 ## Libraries
 
 - [zstd](https://facebook.github.io/zstd/)
+  - [zstdpp](https://github.com/andreiamatuni/zstdpp)
 - [libzip](https://libzip.org/)
 
 ## About Template

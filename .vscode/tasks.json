@@ -1,12 +1,17 @@
 {
     "version": "2.0.0",
     "tasks": [
-        // "Refer: https://github.com/microsoft/vscode-cmake-tools/blob/HEAD/docs/tasks.md"
+        {
+            "type": "cmake",
+            "label": "CMake: configure",
+            "command": "configure",
+            "problemMatcher": [],
+            "detail": "CMake template configure task"
+        },
         {
             "type": "cmake",
             "label": "CMake: build",
             "command": "build",
-            // "dependsOn": ["CMake: Configure"], // 時間がかかるため省略
             "targets": [
                 "all"
             ],
@@ -35,20 +40,20 @@
             "type": "shell",
             "label": "shell ctest",
             "command": [
-                "cd ${workspaceFolder}/build && ctest"
+                "cd ${workspaceFolder}/build/x64 && ctest" // depend on preset name "x64"
             ],
             "dependsOn": [
                 "CMake: build"
             ],
             "detail": "run ctest in shell.",
-            "problemMatcher": [],
+            "problemMatcher": []
         },
         {
             "type": "cmake",
             "label": "CMake: install",
             "command": "install",
             "options": {
-                "installPrefix": "${workspaceFolder}/install",
+                "installPrefix": "${workspaceFolder}/install"
             },
             "detail": "CMake template install task"
         },
@@ -60,17 +65,16 @@
         },
         {
             "type": "shell",
-            "label": "Open Install Directory",
+            "label": "Open explorer",
             "command": [
-                "explorer.exe '${workspaceFolder}\\install'"
+                "explorer.exe ."
             ],
-            "detail": "open ${workspaceFolder}/install in explorer.exe.",
+            "detail": "open ${workspaceFolder} in explorer.exe.",
             "problemMatcher": []
         },
         {
             "type": "shell",
             "label": "C/C++ Check Format for Workspace",
-            // --dry-run オプションを追加すれば、lintも可能
             "windows": {
                 "command": "clang-format -style=file --dry-run --Werror $(Get-ChildItem -Path $PWD/src,$PWD/test,$PWD/include -Recurse | Where Name -Match '.(?:cpp|hpp|h|cc|cxx)$' | Select-Object -ExpandProperty FullName)"
             },
@@ -97,7 +101,6 @@
             ],
             "dependsOn": [],
             "detail": "generate image file showing the dependencies between targets.",
-            // ref: https://cmake.org/cmake/help/latest/module/CMakeGraphVizOptions.html
             "problemMatcher": []
         }
     ],

@@ -1,1 +1,10 @@
-{}
+{
+  "dependencies": [
+    {
+      "name": "zstd",
+      "features": [
+        "tools"
+      ]
+    }
+  ]
+}

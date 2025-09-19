@@ -1,37 +1,41 @@
 cmake_minimum_required(VERSION 3.24)
+
 project(
-  CppTemplateProject
+  CompressionExample
   VERSION 0.1
   LANGUAGES CXX)
 
-# CMake options e.g., cmake ... -DENABLE_SANITIZERS=ON
+# load dotenv file
+include(${CMAKE_SCRIPTS_DIR}/env.cmake)
+load_env(${CMAKE_SOURCE_DIR}/.env)
+
+# CMake options (can be set via a command line option.
+# e.g., cmake ... -DENABLE_SANITIZERS=ON)
 option(CppTemplateProject_OPTION_ENABLE_SANITIZERS "Run AddressSanitizer" OFF)
 
+# set C++ standard
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # generate build/compile_commands.json (for clang-tools)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# set cmake scripts directory
-set(CMAKE_SCRIPTS_DIR ${CMAKE_SOURCE_DIR}/tool/cmake)
+# include cmake scripts
+# (`CMAKE_SCRIPTS_DIR` is set in CMakePresets.json)
 include(${CMAKE_SCRIPTS_DIR}/set_compile_props.cmake)
 include(${CMAKE_SCRIPTS_DIR}/set_warnings_as_errors.cmake)
 include(${CMAKE_SCRIPTS_DIR}/enable_memcheck.cmake)
-include(${CMAKE_SCRIPTS_DIR}/enable_sanitizers.cmake)
-
-# set default install path (can be overwritten with -DCMAKE_INSTALL_PREFIX=...)
-set(CMAKE_INSTALL_PREFIX
-    ${CMAKE_SOURCE_DIR}/install
-    CACHE PATH "..." FORCE)
-
-# create ctest configuration in current directory. This command should be in the
-# source directory root.
-enable_testing()
-
 if(CppTemplateProject_OPTION_ENABLE_SANITIZERS)
+  include(${CMAKE_SCRIPTS_DIR}/enable_sanitizers.cmake)
   enable_sanitizers()
 endif()
+
+# add packages
+find_package(zstd CONFIG REQUIRED)
+
+# create ctest configuration in current directory.
+# This command should be in the source directory root.
+enable_testing()
 
 add_subdirectory(src)
 add_subdirectory(test)

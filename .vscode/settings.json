@@ -5,27 +5,29 @@
     // "F5": テスト実行
     "workspaceKeybindings.myLocalKeyBindings.enabled": true,
     "editor.formatOnSave": true,
-    "workbench.colorCustomizations": {
-        "editorInlayHint.background": "#02020223",
-        "editorInlayHint.foreground": "#eeeeee58",
-    },
     "files.associations": {
         "*.c": "c",
         "*.h": "cpp",
         "*.cpp": "cpp"
     },
+    "workbench.colorCustomizations": {
+        "editorInlayHint.background": "#02020223",
+        "editorInlayHint.foreground": "#eeeeee58",
+    },
     "[cpp]": {
         "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
     },
-    "cmake.generator": "Ninja",
+    // CMake Tools settings
     "cmake.cmakePath": "cmake",
-    "cmake.buildDirectory": "${workspaceFolder}/build",
     "cmake.configureOnOpen": true,
-    "C_Cpp.intelliSenseEngine": "disabled", // using clangd
+    "cmake.useCMakePresets": "always",
+    // Disable C/C++ Extension (use clangd instead)
+    "C_Cpp.intelliSenseEngine": "disabled",
+    // clangd settings
     "clangd.arguments": [
         // "--enable-config", // enable config in .clangd
         "-clang-tidy",
-        "--compile-commands-dir=${workspaceFolder}/build"
+        "--compile-commands-dir=${workspaceFolder}/build/x64" // depend on preset name "x64"
     ],
     // C/C++ Include Guard : follow Google C++ Style Guide
     "C/C++ Include Guard.Macro Type": "Filepath",
