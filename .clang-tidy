@@ -9,6 +9,7 @@ Checks: "-*,
   performance-*,
   portability-*,
   google-*"
+SystemHeaders: false
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: file
