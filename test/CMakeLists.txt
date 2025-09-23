@@ -16,3 +16,9 @@ add_executable(Lz4Test lz4/lz4cpp_test.cpp)
 target_include_directories(Lz4Test PRIVATE ${CMAKE_SOURCE_DIR}/src/lz4)
 target_link_libraries(Lz4Test PRIVATE lz4::lz4)
 enable_gtest(Lz4Test)
+
+add_executable(AesSample cryptopp/cryptopp_aes_test.cpp)
+target_include_directories(AesSample PRIVATE ${CMAKE_SOURCE_DIR}/src/cryptopp)
+target_link_libraries(AesSample PRIVATE cryptopp::cryptopp)
+enable_gtest(AesSample)
+
