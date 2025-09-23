@@ -6,7 +6,12 @@ Example codes for popular compression tools and libraries. (zstd, gzip, etc.)
 
 - [zstd](https://facebook.github.io/zstd/)
   - [zstdpp](https://github.com/andreiamatuni/zstdpp)
+- [lz4](https://github.com/lz4/lz4)
 - [libzip](https://libzip.org/)
+
+Crypto libraries
+- [Crypto++](https://www.cryptopp.com/)
+  - includes DEFLATE libraries (gzip, zlib)
 
 ## About Template
 

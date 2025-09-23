@@ -32,6 +32,7 @@ endif()
 
 # add packages
 find_package(zstd CONFIG REQUIRED)
+find_package(lz4 CONFIG REQUIRED)
 
 # create ctest configuration in current directory.
 # This command should be in the source directory root.
