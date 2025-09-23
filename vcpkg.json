@@ -1,11 +1,12 @@
 {
   "dependencies": [
+    "lz4",
     {
       "name": "zstd",
       "features": [
         "tools"
       ]
     },
-    "lz4"
+    "cryptopp"
   ]
 }
