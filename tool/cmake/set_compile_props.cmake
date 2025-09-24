@@ -13,12 +13,17 @@ function(set_normal_compile_options target)
     # using Visual Studio C++ (/W4) # 例: 警告レベルを設定
     target_compile_options(${target} PRIVATE /W4)
     target_compile_options(${target} PRIVATE $<$<CONFIG:Release>:/O2>)
+    # using utf-8
+    target_compile_options(${target} PRIVATE /utf-8)
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # using GCC or Clang
     target_compile_options(${target} PRIVATE -O2)
     # Wextra : 有用でないor回避しづらい警告を有効にする Wpedantic : コンパイラ拡張機能を警告する Wshadow=local :
     # ローカル変数での変数名の重複を警告する
     target_compile_options(${target} PRIVATE -Wextra -Wpedantic)
+    # using utf-8
+    target_compile_options(${target} PRIVATE -finput-charset=UTF-8
+                                             -fexec-charset=UTF-8)
 
     # Recommended Compile Options by OpenSSF
     # https://best.openssf.org/Compiler-Hardening-Guides/Compiler-Options-Hardening-Guide-for-C-and-C++.html

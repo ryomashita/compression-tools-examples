@@ -1,3 +1,6 @@
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
+# add
 add_library(Add add.cpp)
 set_normal_compile_options(Add)
 set_warnings_as_errors(Add)

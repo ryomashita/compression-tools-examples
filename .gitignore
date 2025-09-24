@@ -5,6 +5,7 @@ install/**
 vcpkg_installed/**
 .env
 CMakeUserPresets.json
+data/**
 
 # Prerequisites
 *.d

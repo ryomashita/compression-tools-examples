@@ -6,14 +6,20 @@
 #include <cryptopp/osrng.h>
 #include <cryptopp/rijndael.h>
 
+#include <chrono>
 #include <cstddef>
+#include <cstdint>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include "utility.hpp"
+
 // From: https://www.cryptopp.com/wiki/Advanced_Encryption_Standard
 // The following program shows how to operate AES in CBC mode using a pipeline.
-int main() {
+// using ./aes_sample [input_file_path]
+int main(int argc, const char **argv) {
   using namespace CryptoPP;
 
   AutoSeededRandomPool prng;
@@ -41,14 +47,33 @@ int main() {
   if (iv_vec.size() != AES::BLOCKSIZE)
     throw std::runtime_error("iv size incorrect");
 
-    
-  std::string plain = "CBC Mode Test for pipeline processing";
-  std::string cipher, recovered; // ciphertext and recovered text
+  auto tp_input_start = utils::now();
 
-  std::cout << "plain text: " << plain << std::endl;
+  // road input
+  std::vector<byte> plain;
+  if (argc > 1) {
+    // コマンドライン引数がある場合は、argv[1] をファイル名として読み込む.
+    std::string filename = argv[1];
+    std::ifstream ifs(filename);
+    if (!ifs) {
+      utils::PrintLn("failed to open file: {}", filename);
+      return 1;
+    }
+    plain = std::vector<byte>((std::istreambuf_iterator<char>(ifs)),
+                              std::istreambuf_iterator<char>());
+    utils::PrintLn("read {:L} bytes from {}", plain.size(), filename);
+  } else {
+    std::string plain_txt = "CBC Mode Test for pipeline processing";
+    plain = std::vector<byte>(plain_txt.begin(), plain_txt.end());
+  }
 
+  std::vector<byte> cipher, recovered; // ciphertext and recovered text
+
+  auto tp_input_end = utils::now();
+  utils::PrintElapsed(tp_input_start, tp_input_end, "input", plain.size());
   /*********************************\
   \*********************************/
+  auto tp_start_encryption = utils::now();
 
   // Crypto++ では Source -> Filter -> Sink のパイプラインで処理を行う。 (Unix
   // pipe を目指している) Source, Sink には以下の種類がある:
@@ -66,14 +91,13 @@ int main() {
     CBC_Mode<AES>::Encryption e;
     e.SetKeyWithIV(key, key.size(), iv);
 
-#if 0
+#if 1
     // Same as: `StringSource s(plain, ...` (see definition of StringSource)
-    ArraySource s((const byte*)plain.data(), (size_t)plain.size(),
-                  true,
-                   new StreamTransformationFilter(
-                       e,
-                       new StringSink(cipher)) // StreamTransformationFilter
-    );                                         // StringSource
+    ArraySource s((const byte *)plain.data(), (size_t)plain.size(), true,
+                  new StreamTransformationFilter(
+                      e,
+                      new VectorSink(cipher)) // StreamTransformationFilter
+    );                                        // StringSource
 #else
     // 一度に処理する代わりに、Put() を使い手動でデータを流し込むこともできる。
     StreamTransformationFilter encryptor(e, new StringSink(cipher));
@@ -85,65 +109,80 @@ int main() {
     encryptor.MessageEnd();
 #endif
   } catch (const Exception &e) {
-    std::cerr << e.what() << std::endl;
+    utils::PrintError(e);
     exit(1);
   }
 
+  auto tp_end_encryption = utils::now();
+  utils::PrintElapsed(tp_start_encryption, tp_end_encryption,
+                      "encryption", plain.size());
   /*********************************\
   \*********************************/
 
-  std::cout << "key length (default): " << AES::DEFAULT_KEYLENGTH << std::endl;
-  std::cout << "key length (min): " << AES::MIN_KEYLENGTH << std::endl;
-  std::cout << "key length (max): " << AES::MAX_KEYLENGTH << std::endl;
-  std::cout << "block size: " << AES::BLOCKSIZE << std::endl;
+  // display key, iv, cipher
 
-  HexEncoder encoder(new FileSink(std::cout)); // Converts given data to base 16
-  // display key, iv, and cipher text
-  std::cout << "key size [bytes]: " << key.size() << std::endl;
+  utils::PrintLn("key length (default): {}", (uint32_t)AES::DEFAULT_KEYLENGTH);
+  utils::PrintLn("key length (min): {}", (uint32_t)AES::MIN_KEYLENGTH);
+  utils::PrintLn("key length (max): {}", (uint32_t)AES::MAX_KEYLENGTH);
+  utils::PrintLn("block size: {}", (uint32_t)AES::BLOCKSIZE);
+  utils::PrintLn("key size [bytes]: {}", key.size());
+
+#if 0
+  // HexEcoder を使うと, 16進数表記で Sink に出力できる.
+  HexEncoder encoder(new FileSink(std::cout));
   std::cout << "key: ";
   encoder.Put(key, key.size());
   encoder.MessageEnd();
   std::cout << std::endl;
+#else
+  utils::Print("key: ");
+  utils::PrintHexArray((const std::byte *)key.data(), key.size());
+#endif
 
-  std::cout << "iv size [bytes]: " << iv.size() << std::endl;
-  std::cout << "iv: ";
-  encoder.Put(iv, iv.size());
-  encoder.MessageEnd();
-  std::cout << std::endl;
+  utils::Print("iv size [bytes]: {}\n", iv_vec.size());
+  utils::Print("iv: ");
+  utils::PrintHexArray((const std::byte *)iv_vec.data(), iv_vec.size());
 
-  std::cout << "plane size [bytes]: " << plain.size() << std::endl;
-  std::cout << "cipher size [bytes]: " << cipher.size() << std::endl;
+  utils::PrintLn("plane size [bytes]: {}", plain.size());
+  utils::PrintLn("cipher size [bytes]: {}", cipher.size());
+#if 0
   std::cout << "cipher text: ";
   encoder.Put((const byte *)&cipher[0], cipher.size());
   encoder.MessageEnd();
   std::cout << std::endl;
+#endif
 
   /*********************************\
   \*********************************/
+  auto tp_start_decryption = utils::now();
 
   // decryption
   try {
     CBC_Mode<AES>::Decryption d;
     d.SetKeyWithIV(key, key.size(), iv);
 
-    StringSource s(cipher, true,
+    VectorSource s(cipher, true,
                    new StreamTransformationFilter(
                        d,
-                       new StringSink(recovered)) // StreamTransformationFilter
+                       new VectorSink(recovered)) // StreamTransformationFilter
     );                                            // StringSource
 
-    std::cout << "recovered text: " << recovered << std::endl;
+    // std::cout << "recovered text: " << recovered << std::endl;
   } catch (const Exception &e) {
-    std::cerr << e.what() << std::endl;
+    utils::PrintError(e);
     exit(1);
   }
 
+  auto tp_end_decryption = utils::now();
+  utils::PrintElapsed(tp_start_decryption, tp_end_decryption,
+                      "decryption", cipher.size());
+
+  /*********************************\
+  \*********************************/
   /* Verify the result */
-  if (plain == recovered)
-    std::cout << "AES CBC mode encryption and decryption: successful"
-              << std::endl;
-  else
-    std::cout << "AES CBC mode encryption and decryption: failed" << std::endl;
+  bool success = plain == recovered;
+  utils::PrintLn("AES CBC mode encryption and decryption: {}",
+                 success ? "successful" : "failed");
 
   return 0;
 }
