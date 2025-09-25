@@ -39,12 +39,12 @@ TEST_F(ZstdppTestF, BlockRoundTrip) {
 
 TEST_F(ZstdppTestF, StreamRoundTrip) {
   // Compress and Decompress using streams
-  std::string tempPath = std::filesystem::temp_directory_path().string();
+  std::filesystem::path tempPath = std::filesystem::temp_directory_path().string();
   std::cout << "Using temp path: " << tempPath << '\n';
   std::string 
-    infile{tempPath + "input_stream_c.txt"}, 
-    outfile{tempPath + "output_stream_c.zip"},
-    decomp_outfile{tempPath + "decompressed_stream_c.txt"};
+    infile{(tempPath / "input_stream_c.txt").string()}, 
+    outfile{(tempPath / "output_stream_c.zip").string()},
+    decomp_outfile{(tempPath / "decompressed_stream_c.txt").string()};
 
   fs::create_file(infile, zstdpp::utils::to_bytes(input));
     
