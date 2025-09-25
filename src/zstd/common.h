@@ -18,7 +18,16 @@
 #include <stdio.h>     // fprintf, perror, fopen, etc.
 #include <string.h>    // strerror
 #include <errno.h>     // errno
-#include <sys/stat.h>  // stat
+#ifdef _WIN32
+  #include <sys/stat.h>
+  typedef struct _stati64 stat_t;
+  #define stat_func _stati64
+#else
+  #define _FILE_OFFSET_BITS 64
+  #include <sys/stat.h>
+  typedef struct stat stat_t;
+  #define stat_func stat
+#endif
 #include <zstd.h>
 
 
@@ -81,6 +90,7 @@ typedef enum {
  */
 HEADER_FUNCTION size_t fsize_orDie(const char *filename)
 {
+#if 0
     struct stat st;
     if (stat(filename, &st) != 0) {
         /* error */
@@ -95,10 +105,20 @@ HEADER_FUNCTION size_t fsize_orDie(const char *filename)
      *    the file size is too large for type size_t.
      */
     if ((fileSize < 0) || (fileSize != (off_t)size)) {
-        fprintf(stderr, "%s : filesize too large \n", filename);
+        fprintf(stderr, "%s : filesize too large (over 32bit) \n", filename);
         exit(ERROR_largeFile);
     }
     return size;
+#else
+    // fixed: use 64bit file API
+    stat_t st;
+    if(stat_func(filename, &st) != 0) {
+        /* error */
+        perror(filename);
+        exit(ERROR_fsize);
+    }
+    return (size_t)st.st_size;
+#endif
 }
 
 /*! fopen_orDie() :
