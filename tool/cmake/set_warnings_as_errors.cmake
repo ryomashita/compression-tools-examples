@@ -1,7 +1,7 @@
 function(set_warnings_as_errors target)
   if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC"
-     OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_SIMULATE_ID MATCHES
-                                                   "MSVC"))
+     OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND 
+          CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"))
     target_compile_options(${target} PRIVATE /WX)
     if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       # replace /W+ with /W4

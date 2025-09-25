@@ -1,12 +1,8 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/HEAD/docs/vcpkg.schema.json",
   "dependencies": [
+    "cryptopp",
     "lz4",
-    {
-      "name": "zstd",
-      "features": [
-        "tools"
-      ]
-    },
-    "cryptopp"
+    "zstd"
   ]
 }

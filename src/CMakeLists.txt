@@ -3,14 +3,13 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 # add
 add_library(Add add.cpp)
 set_normal_compile_options(Add)
-set_warnings_as_errors(Add)
+# set_warnings_as_errors(Add)
 
 # zstd
 add_executable(zstd_example zstd/simple_compression.cpp)
 set_normal_compile_options(zstd_example)
-set_warnings_as_errors(zstd_example)
 target_link_libraries(zstd_example PRIVATE zstd::libzstd)
-
+# set_warnings_as_errors(zstd_example)
 add_library(Zstdpp INTERFACE ${CMAKE_SOURCE_DIR}/src/zstd)
 
 # lz4

@@ -8,8 +8,8 @@ function(set_normal_compile_options target)
 
   # Set Compile Options
   if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC"
-     OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_SIMULATE_ID MATCHES
-                                                   "MSVC"))
+     OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND 
+          CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"))
     # using Visual Studio C++ (/W4) # 例: 警告レベルを設定
     target_compile_options(${target} PRIVATE /W4)
     target_compile_options(${target} PRIVATE $<$<CONFIG:Release>:/O2>)
